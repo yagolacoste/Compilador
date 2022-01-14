@@ -1,0 +1,324 @@
+/% Variables y procedimientos bien definidos y al alcance, con cumplimiento del alcance NA %/
+DOUBLE a, r;
+PROC z (DOUBLE g) NA = 5_ul {
+	PROC c (DOUBLE m) NA = 1_ul {
+		DOUBLE a;
+		a = 2.0;
+		PROC d () NA = 0_ul {
+			a = r;
+		};	
+	};
+	PROC d () NA = 0_ul {
+		a = r;
+	};
+};
+
+PROC d () NA = 0_ul {
+	a = r;
+};
+
+z(a); 
+
+
+/%Variables y procedimientos que no se encuentran al alcance, incompatibilidad de tipos y procedimientos mal definidos%
+PROC z (DOUBLE g) NA = 5_ul {
+	PROC c (DOUBLE m) NA = 0_ul {
+		ULONGINT b;
+		b = 2.0;
+	};
+	PROC c () NA = 0_ul {
+		a = 2.0;
+	};
+};
+
+ULONGINT a;
+PROC d (DOUBLE b) NA = 2.0 {
+	a = 2.0; 
+};
+
+c(); 
+
+
+/% Sentencia IF, sentencia FOR y conversión bien definidas %/
+ULONGINT a;
+ULONGINT b;
+ULONGINT c;
+ULONGINT i;
+
+a = 2_ul;
+b = 1_ul;
+c = 7_ul;
+
+IF(a < b){
+	a = 15_ul;
+	FOR(i = 5_ul; i <= c; UP 1_ul){
+		OUT('Entro for');
+		a = b - a;
+	};
+} ELSE{
+	OUT('Entro else');
+	a = a + 5_ul;
+}END_IF;
+
+
+/% Sentencia IF, sentencia FOR y conversiones mal definidas%/
+DOUBLE a;
+ULONGINT b;
+ULONGINT i;
+IF(a > b){
+	a = 15.0;
+	FOR(i = 5_ul; i <= a; DOWN 1.0){
+		i = ULONGINT(b+a) / i;
+	};
+} END_IF;
+
+
+/%Niveles de anidamiento correctos y asignacion de variables fuera del ambito%/
+PROC z (DOUBLE g) NA = 5_ul {
+	DOUBLE a;
+	PROC c (DOUBLE g) NA = 0_ul {
+		DOUBLE a;
+		z :: a = 2.0;
+		a = z :: g + g;
+	};
+	PROC d () NA = 0_ul {
+		a = g;
+	};
+};
+
+
+/% Superacion niveles de anidamiento e incorrecta asignacion de variables fuera del ambito%/
+PROC z (DOUBLE g) NA = 2_ul {
+	DOUBLE a;
+	PROC c (DOUBLE g) NA = 0_ul {
+		DOUBLE a;
+		z :: a = 2.0;
+		a = z :: g + g;
+		PROC c (DOUBLE b) NA = 0_ul {
+			a = 2.0; 
+		};
+	};
+	PROC c () NA = 0_ul {
+		a = b;
+	};
+};
+
+
+/% Sentencias ejecutables combinadas%
+DOUBLE a;
+DOUBLE b;
+ULONGINT c;
+ULONGINT d;
+IF(a != b){
+	a = 15.0;
+	FOR(c = 5_ul; c <= d; DOWN 1_ul){
+		b = DOUBLE (d);
+		IF( c == d)
+			FOR(c = 5_ul; c > d; UP1_ul)
+				a = b + DOUBLE ( c ) * DOUBLE (d);
+		ELSE
+			a = b + DOUBLE (c/d) * DOUBLE (d);  
+		END_IF;
+	};
+} END_IF;
+
+
+/% Sentencias ejecutables combinadas mal definidas%
+DOUBLE a;
+DOUBLE b;
+ULONGINT c;
+ULONGINT d;
+IF(a != b){
+	a = 15.0;
+	FOR(c = 5_ul; c <= d; DOWN 1.0){
+		b = DOUBLE (d);
+		IF( c == d)
+			FOR(a = 5_ul; a > d; UP1.0){
+				a = b + DOUBLE ( c ) * DOUBLE (d);
+ELSE
+a = b + DOUBLE ( c ) * DOUBLE (d);  
+};
+} END_IF;
+
+
+/% Combinaciones de parametros de distintos tipos bien definidos %/
+DOUBLE b;
+PROC z (DOUBLE g, ULONGINT h, DOUBLE i) NA = 5_ul {
+	DOUBLE a;
+	PROC c (ULONGINT g, DOUBLE y) NA = 3_ul {
+		z::a = 2.0;
+		a = z :: g + y;
+		PROC d (DOUBLE g) NA = 1_ul {
+			a = g;
+			PROC d () NA = 1_ul {
+				a = b;
+			};
+		};
+	};
+};
+
+
+/% Combinaciones de parametros de distintos tipos mal definidos%/
+DOUBLE b;
+PROC z (DOUBLE g, ULONGINT g, DOUBLE i) NA = 5_ul {
+	PROC c (ULONGINT g, DOUBLE y) NA = 3_ul {
+		z::a = 2.0;
+		a = z :: g + y;
+		PROC d (DOUBLE g) NA = 1_ul {
+			a = g;
+			PROC d () NA = 1_ul {
+				a = b;
+			};
+		};
+	};
+};
+
+
+/% Redefinicion de parametros, variables y procedimientos %/
+PROC z (DOUBLE g, ULONGINT g) NA = 1_ul {
+	DOUBLE a;
+	DOUBLE a;
+	PROC c (ULONGINT g, DOUBLE g) NA = 1_ul {
+		DOUBLE a;
+		PROC d (DOUBLE g, ULONGINT h, DOUBLE i) NA = 1_ul {
+			a = a;
+		};
+	};
+	PROC c () NA = 1_ul {
+		DOUBLE a;
+	};
+};
+
+
+/% Errores en tiempo de ejecucion (division por cero y restas negativas para ULONGINT) %/
+DOUBLE a, b, c;
+ULONGINT d, e, f;
+b = 5.0;
+c = 0.;
+a = b / c;
+d = 10_ul;
+e = 20_ul;
+f = d - e;
+
+
+/% Casos de Prueba primera entrega%/
+/% Casos de prueba en los que involucramos errores lexicos y sintacticos %/
+/% Identificadores bien y mal definidos %/ 
+ULONGINT identificador;
+ULONGINT identificadordepruebalongitud;
+ULONGINT identificadorprueba;
+ULONGINT id2 ;
+ULONGINT id2prueba;
+ULONGINT identificador_prueba;
+ULONGINT identificadorPrueba;
+ULONGINT identificadorDePruebaLongitud;
+ULONGINT Id;
+ULONGINT 5id;
+ULONGINT _id;
+
+/%Constantes y reales bien y mal definidos %/
+ULONGINT id_ulongint =32767_ul;
+ULONGINT id_ulongint = -32768_ul;
+ULONGINT id_ulongint = 4294967296_ul;
+ULONGINT id_ulongint = -4294967296_ul;
+ULONGINT id_ulongint = 32767;
+ULONGINT id_ulongint = -4294967296;
+DOUBLE id_double = 13.0; 
+DOUBLE id_double = .05; 
+DOUBLE id_double = 13.d+1;
+DOUBLE id_double = .5d+1; 
+DOUBLE id_double = 1.7976931348623157d+308;
+DOUBLE id_double = 13.5d-1; 
+DOUBLE id_double = 2.2250738585072014d-308;
+DOUBLE id_double = 13.;
+DOUBLE id_double = 2.2250738585072014d308; 
+DOUBLE id_double = 1.7976931348623158d+308;
+DOUBLE id_double = 1;
+DOUBLE id_double = 1d+2;
+
+/%Palabras reservadas mal definidas %/
+ULONGINT a, b, i;
+	if(a > b){
+     		a=b;
+	}
+	end_if;
+
+	for(i=4_ul;i<a+b;UP 2_ul){
+        	if(a<b){
+               	 a=b;
+       	 	}
+        	end_if;
+	};
+
+/%Palabras reservadas bien definidas definidas %/
+ULONGINT a, b, i;
+	IF(a > b){
+    	    a=b;
+	}
+	END_IF;
+
+	FOR(i=4_ul;i<a+b;UP 2_ul){
+        	IF(a<b){
+                	a=b;
+        	}
+        	END_IF;
+	};
+
+/%Cadenas bien y mal definidas %/
+
+	OUT('Esta es una cadena bien definida');
+	OUT('Esta es una cadena mal definida);
+
+/%Comentarios bien y mal definidos%/
+	/%Este es un comentario bien definido%/
+	/%Este es un comentario
+	 bien definido%/
+	/%Este es un comentario mal defindo
+	/%Este es un comentario 
+	mal defindo
+
+/%Operadores aritmeticos, logicos y caracteres que deben ser soportados por la gramatica%/
+ULONGINT id;	
+	IF(0_ul < 1_ul){
+		 id = 2_ul + 3_ul;
+	} END_IF;
+	
+	IF(0_ul <= 1_ul){
+		 id = 2_ul * 3_ul;
+	} END_IF;
+	
+	IF(0_ul > 1_ul){
+		 id = 2_ul / 3_ul;
+	} END_IF;
+	
+	IF(0_ul >= 1_ul){
+		 id = 2_ul - 3_ul;
+	} END_IF;
+
+
+
+/%Sentencias ejecutables mal definidas%/
+
+ULONGINT i, a, b;
+FOR(;i<a+b;UP 2_ul){
+        IF(a<b){
+		DOUBLE(a+b
+        }
+        END_IF;
+};
+
+
+
+/%Sentencias declarativas bien y mal definidas %/
+PROC hola (DOUBLE d1) NA = 1_ul {
+	DOUBLE d2;
+	PROC chau()NA = 2_ul{
+		d1=d2;};
+};
+
+PROC hola ( NA = 1_ul {
+	DOUBLE d2;
+	PROC chau()NA = 2_ul{
+		d1=d2;};
+};
+

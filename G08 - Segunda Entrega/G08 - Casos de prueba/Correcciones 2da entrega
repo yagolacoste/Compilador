@@ -1,0 +1,394 @@
+EJEMPLO 1
+//EJEMPLO da el mensaje de "se espera ID del lado izquierdo"
+ULONGINT a, b, i;
+a = 6_ul;
+b = 6_ul;
+DOUBLE c; //Esta definición debería estar arriba
+c = DOUBLE(a);
+
+LA FORMA CORRECTA SERÍA
+ULONGINT a, b, i;
+DOUBLE c;
+a = 6_ul;
+b = 6_ul;
+c = DOUBLE(a);
+---------
+
+.386
+.model flat, stdcall
+option casemap :none
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
+.STACK 200h
+.data
+_errorCero DB "Error division", 0
+_errorNegativo DB "Error resta" , 0
+_ceroDOUBLE DQ 0.0
+_ceroULONGINT DD 0
+_6 DD 6
+_b@main DD ?
+_a@main DD ?
+_i@main DD ?
+_c@main DQ ?
+_@aux0 DQ ?
+.code
+Error_Resta_Negativa:
+invoke MessageBox, NULL, addr _errorNegativo, addr _errorNegativo, MB_OK
+invoke ExitProcess, 0
+Error_Division_Cero:
+invoke MessageBox, NULL, addr _errorCero, addr _errorCero, MB_OK
+invoke ExitProcess, 0
+START:
+FNINIT
+MOV EAX, _6
+MOV _a@main, EAX
+MOV EAX, _6
+MOV _b@main, EAX
+FILD _a@main
+FSTP _@aux0
+FLD _@aux0
+FSTP _c@main
+invoke ExitProcess, 0
+END START
+
+EJEMPLO 2
+-------------------// da error en la condición
+CAMBIOS:
+1- Permitimos que al principio del programa entren sentencias ejecutables solas (No pueden venir solo sentencias declarativas)
+	|lista_sentencias_ejecutables
+	{
+		syntacticTree = $1.tree;
+	}
+2- En la condición del FOR y la asignación del FOR chequeamos que cuando no se encuentra al alcance una variable, de error
+
+
+FOR(i=1_ul;i<b+a;UP 2_ul){ //Faltan definir las variables que se utilizan
+        IF(i<a){
+                a=b;
+OUT('FOR OKK');
+        }
+        END_IF;
+};
+
+LA FORMA CORRECTA SERÍA
+ULONGINT i, a, b;
+FOR(i=1_ul;i<b+a;UP 2_ul){ 
+        IF(i<a){
+                a=b;
+OUT('FOR OKK');
+        }
+        END_IF;
+};
+
+.386
+.model flat, stdcall
+option casemap :none
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
+.STACK 200h
+.data
+_errorCero DB "Error division", 0
+_errorNegativo DB "Error resta" , 0
+_ceroDOUBLE DQ 0.0
+_ceroULONGINT DD 0
+_S0 DB "FOR OKK", 0
+_b@main DD ?
+_a@main DD ?
+_2 DD 2
+_i@main DD ?
+_1 DD 1
+.code
+Error_Resta_Negativa:
+invoke MessageBox, NULL, addr _errorNegativo, addr _errorNegativo, MB_OK
+invoke ExitProcess, 0
+Error_Division_Cero:
+invoke MessageBox, NULL, addr _errorCero, addr _errorCero, MB_OK
+invoke ExitProcess, 0
+START:
+FNINIT
+MOV EAX, _1
+MOV _i@main, EAX
+FOR_INICIO1:
+MOV EAX, _b@main
+ADD EAX, _a@main
+MOV EBX, _i@main
+CMP EBX, EAX
+JGE FOR_CMP1
+MOV EAX, _i@main
+CMP EAX, _a@main
+JGE IF_CMP1
+MOV EAX, _b@main
+MOV _a@main, EAX
+invoke MessageBox, NULL, addr _S0, addr _S0, MB_OK 
+JMP IF_THEN1
+IF_CMP1:
+IF_THEN1:
+MOV EAX, _i@main
+ADD EAX, _2
+MOV _i@main, EAX
+JMP FOR_INICIO1
+FOR_CMP1:
+invoke ExitProcess, 0
+END START
+
+EJEMPLO 3
+------------------// Genera un código de assembler vacio.
+DOUBLE c,d;
+ULONGINT a, b, i;
+a = 6_ul;
+b = 6_ul;
+c = 3.0;
+IF (c == 6.0){
+OUT('conv ok');
+}
+END_IF;
+a = a * b + a;
+c = 3.0 + 28.0 * 0.25; //FALTA PUNTO Y COMA, como hay un error léxico, el árbol no se genera
+
+IF (c == 10.0){
+OUT('op ok');
+}
+END_IF;
+
+.386
+.model flat, stdcall
+option casemap :none
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
+.STACK 200h
+.data
+_errorCero DB "Error division", 0
+_errorNegativo DB "Error resta" , 0
+_ceroDOUBLE DQ 0.0
+_ceroULONGINT DD 0
+_D2 DQ 28.0
+_S0 DB "conv ok", 0
+_i@main DD ?
+_D4 DQ 10.0
+_d@main DQ ?
+_D1 DQ 6.0
+_6 DD 6
+_c@main DQ ?
+_b@main DD ?
+_D3 DQ 0.25
+_a@main DD ?
+_S1 DB "op ok", 0
+_D0 DQ 3.0
+_@aux0 DW ?
+_@aux1 DQ ?
+_@aux2 DQ ?
+_@aux3 DW ?
+.code
+Error_Resta_Negativa:
+invoke MessageBox, NULL, addr _errorNegativo, addr _errorNegativo, MB_OK
+invoke ExitProcess, 0
+Error_Division_Cero:
+invoke MessageBox, NULL, addr _errorCero, addr _errorCero, MB_OK
+invoke ExitProcess, 0
+START:
+FNINIT
+MOV EAX, _6
+MOV _a@main, EAX
+MOV EAX, _6
+MOV _b@main, EAX
+FLD _D0
+FSTP _c@main
+FLD _c@main
+FCOMP _D1
+FSTSW _@aux0
+MOV AX, _@aux0
+SAHF
+JNE IF_CMP1
+invoke MessageBox, NULL, addr _S0, addr _S0, MB_OK 
+JMP IF_THEN1
+IF_CMP1:
+IF_THEN1:
+MOV EAX, _a@main
+MOV EDX, 0
+MUL b@main
+ADD EAX, _a@main
+MOV _a@main, EAX
+FLD _D2
+FLD _D3
+FMUL
+FSTP _@aux1
+FLD _D0
+FLD _@aux1
+FADD
+FSTP _@aux2
+FLD _@aux2
+FSTP _c@main
+FLD _c@main
+FCOMP _D4
+FSTSW _@aux3
+MOV AX, _@aux3
+SAHF
+JNE IF_CMP2
+invoke MessageBox, NULL, addr _S1, addr _S1, MB_OK 
+JMP IF_THEN2
+IF_CMP2:
+IF_THEN2:
+invoke ExitProcess, 0
+END START
+
+EJEMPLO 4
+--------------- // ERROR EN ASSEMBLER
+CAMBIOS:
+1- Sacamos el operando izquierdo de la sentencia de assembler
+
+DOUBLE a, b, i;
+a = 6.0;
+b = 6.0;
+a = a * b + a;
+IF (a == 42.0){
+OUT('op ok');
+}
+END_IF;
+
+.386
+.model flat, stdcall
+option casemap :none
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
+.STACK 200h
+.data
+_errorCero DB "Error division", 0
+_errorNegativo DB "Error resta" , 0
+_ceroDOUBLE DQ 0.0
+_ceroULONGINT DD 0
+_b@main DQ ?
+_a@main DQ ?
+_D0 DQ 6.0
+_i@main DQ ?
+_D1 DQ 42.0
+_S0 DB "op ok", 0
+_@aux0 DQ ?
+_@aux1 DQ ?
+_@aux2 DW ?
+.code
+Error_Resta_Negativa:
+invoke MessageBox, NULL, addr _errorNegativo, addr _errorNegativo, MB_OK
+invoke ExitProcess, 0
+Error_Division_Cero:
+invoke MessageBox, NULL, addr _errorCero, addr _errorCero, MB_OK
+invoke ExitProcess, 0
+START:
+FNINIT
+FLD _D0
+FSTP _a@main
+FLD _D0
+FSTP _b@main
+FLD _a@main
+FLD _b@main
+FMUL
+FSTP _@aux0
+FLD _@aux0
+FLD _a@main
+FADD
+FSTP _@aux1
+FLD _@aux1
+FSTP _a@main
+FLD _a@main
+FCOMP _D1
+FSTSW _@aux2
+MOV AX, _@aux2
+SAHF
+JNE IF_CMP1
+invoke MessageBox, NULL, addr _S0, addr _S0, MB_OK 
+JMP IF_THEN1
+IF_CMP1:
+IF_THEN1:
+invoke ExitProcess, 0
+END START
+EJEMPLO 5
+------------------ //error assembler
+DOUBLE a;
+ULONGINT d, e, f;
+a = 34.0;
+a = a + a * a;
+d = 5_ul;
+a = DOUBLE(d);
+IF (a == 5.0){
+OUT('OP OK');
+}
+END_IF;
+
+Error: simbolo _@aux2 redefinido, operandos inválidos linea 56 y 57.
+
+.386
+.model flat, stdcall
+option casemap :none
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
+.STACK 200h
+.data
+_errorCero DB "Error division", 0
+_errorNegativo DB "Error resta" , 0
+_ceroDOUBLE DQ 0.0
+_ceroULONGINT DD 0
+_S0 DB "OP OK", 0
+_5 DD 5
+_D0 DQ 34.0
+_a@main DQ ?
+_D1 DQ 5.0
+_f@main DD ?
+_e@main DD ?
+_d@main DD ?
+_@aux0 DQ ?
+_@aux1 DQ ?
+_@aux2 DQ ?
+_@aux3 DW ?
+.code
+Error_Resta_Negativa:
+invoke MessageBox, NULL, addr _errorNegativo, addr _errorNegativo, MB_OK
+invoke ExitProcess, 0
+Error_Division_Cero:
+invoke MessageBox, NULL, addr _errorCero, addr _errorCero, MB_OK
+invoke ExitProcess, 0
+START:
+FNINIT
+FLD _D0
+FSTP _a@main
+FLD _a@main
+FLD _a@main
+FMUL
+FSTP _@aux0
+FLD _a@main
+FLD _@aux0
+FADD
+FSTP _@aux1
+FLD _@aux1
+FSTP _a@main
+MOV EAX, _5
+MOV _d@main, EAX
+FILD _d@main
+FSTP _@aux2
+FLD _@aux2
+FSTP _a@main
+FLD _a@main
+FCOMP _D1
+FSTSW _@aux3
+MOV AX, _@aux3
+SAHF
+JNE IF_CMP1
+invoke MessageBox, NULL, addr _S0, addr _S0, MB_OK 
+JMP IF_THEN1
+IF_CMP1:
+IF_THEN1:
+invoke ExitProcess, 0
+END START
